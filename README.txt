@@ -4,8 +4,6 @@ slick scroller ... shooter (like chromium-bsu)
 
 
 partie graphique lib : SDL2
-	https://wiki.libsdl.org
-	http://www.willusher.io/sdl2%20tutorials/2013/08/17/lesson-1-hello-world
 
 A modifier: 
 
@@ -21,4 +19,9 @@ Avancement:
 
 Compilation:
 	Utilisation d'un Makefile.
+
+Liens :
+https://wiki.libsdl.org
+http://www.willusher.io/sdl2%20tutorials/2013/08/17/lesson-1-hello-world
+http://cpp.developpez.com/cours/cpp/
 
