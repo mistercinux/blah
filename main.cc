@@ -1,142 +1,133 @@
-#include <iostream>	// Lib de base pour C++
+#include <iostream>	
 #include <stdio.h>
 #include <stdlib.h>
-#include <SDL2/SDL.h>
+#include <SDL2/SDL.h>       // Les fonctions commencent par SDL
+#include <SDL2/SDL_image.h> // Les fonctions commencent par IMG
+#include "vaisseau.h"
+#include "rocket.h"
 
-#define DELTA 2 // Nombre de pixels par déplacement
 
-const int SCREEN_W = 640;		// Largeur de fenêtre
-const int SCREEN_H = 480;		// Hauteur de fenêtre
-
-const std::string windowTitle = "Mon titre, blah!";
-const std::string bgPath = "images/fond.bmp";
-const std::string playerPath = "images/player.bmp";
-
-// Fonction d'affichage d'erreur SDL
-void ShowSDLError(const std::string msg) {
-  fprintf(stderr,"%s: %s\n", msg.c_str(), SDL_GetError());
-  return;
+// F() Affichage d'erreur SDL ****
+void ShowSDLError(const std::string& msg) {  //----------> décaller le & pour voire si ca revient au même
+  std::cerr << msg << ": " << IMG_GetError << std::endl;
 }
 
-// Fonction de chargement de la textures dans le renderer
-SDL_Texture *LoadSDLSurface(const std::string path, SDL_Renderer *ren){
+
+// F() **** Chargement de la textures dans le renderer ****
+SDL_Texture *loadTexture(const std::string &path, SDL_Renderer *ren){
   
-  SDL_Texture *texture = NULL;
-  SDL_Surface *img = SDL_LoadBMP(path.c_str());
+  SDL_Texture *texture = IMG_LoadTexture(ren, path.c_str());
   printf("Chargement de l'image %s ...\n", path.c_str());
-  
-  if (img != NULL){
-    texture = SDL_CreateTextureFromSurface(ren, img);
-    SDL_FreeSurface(img);
-    
-    if (texture != NULL)
-      return texture;
-    else {
-      ShowSDLError("CreateTextureFromSurface");
+
+  if (texture == nullptr) {
+      ShowSDLError("loadTexture");
       return NULL;
-    }
   }
-  else {
-    ShowSDLError("SDL_CreateSurface");
-    return NULL;
-  }
-  
+
+  return texture;
 }
 
-// Préparation de l'affichage de la texture
-void RenderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y) {
+// F() **** Préparation de l'affichage de la texture (Avec largeur et hauteur) ****
+void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y, int w, int h) {
   
   SDL_Rect destination;
   destination.x = x;
   destination.y = y;
+  destination.w = w;
+  destination.h = h;
+  
+  SDL_RenderCopy(ren, tex, NULL, &destination);
+}
+
+// F() **** Préparation de l'affichage de la texture (Sans largeur et hauteur) ****
+void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y) {
+  
+  SDL_Rect destination;
+  destination.x = x;
+  destination.y = y;
+  
   // Query texture to get its width and height
   SDL_QueryTexture(tex, NULL, NULL, &destination.w, &destination.h);
   SDL_RenderCopy(ren, tex, NULL, &destination);
 }
 
 
-class vaisseau {
-  
-  int x_size;
-  int y_size;
-  int posx;
-  int posy;
-  int posx_min;
-  int posx_max;
-  int posy_min;
-  int posy_max;
-  int player; 	// 1 si c'est le joueur ou un bonus,
-  // 0 si c'est un ennemi
-  
-public:
-  void init(SDL_Texture *tex, int kindOf); // kindOf --> set player to 0 or 1
-  
-  int getx(void) {
-    return posx;
-  }
-  
-  int gety(void){
-    return posy;
-  }
-  
-  void setx(int delta) {
-    if (delta > 0) {
-      if ((posx + delta) <= posx_max)
-	posx += delta;
-    }
-    else if (delta < 0)
-      if((posx + delta) >= posx_min)
-	posx += delta;	  
-  }
-  
-  void sety(int delta) {
-    if (delta > 0) {
-      if ((posy + delta) <= posy_max)
-	posy += delta;
-    }
-    else if (delta < 0)
-      if((posy + delta) >= posy_min)
-	posy += delta;
-  }
-};
 
-void vaisseau::init(SDL_Texture *tex, int kindOf) {
-  
-  player = kindOf;
-  SDL_QueryTexture(tex, NULL, NULL, &x_size, &y_size);
-  posx = ((::SCREEN_W / 2) - (x_size / 2));
-  posy = (::SCREEN_H - (2*y_size));
-  
-  posx_min = 0;
-  posx_max = (::SCREEN_W - x_size);
-  
-  if (player) {
-    posy_min = 0;
-    posy_max = (::SCREEN_H - y_size);
-  }
-  else {
-    posy_min = (0 - y_size);
-    posy_max = (::SCREEN_H);
-  }
-  
-  return;
+// F() **** Positionnement de départ du vaisseau ****
+void startPosition(int xscreen, int yscreen, vaisseau *Vaisseau, int who) {
+  Vaisseau->setx((xscreen / 2) - (Vaisseau->x_size / 2)); 
+  Vaisseau->sety(yscreen - (2*Vaisseau->y_size));         
+  Vaisseau->setx_max(xscreen - Vaisseau->x_size);         
+  Vaisseau->sety_max(yscreen - Vaisseau->y_size);
+  Vaisseau->setdir(who);
 }
 
+// F() **** Nettoyage mémoire Rockets ****
+int clearRockets (rocket *lst) {
+
+  rocket *prev = NULL;
+
+  while (lst != NULL) {
+    prev = lst;
+    lst = lst->next;
+    std::cout << "Delete: " << prev << std::endl;
+    delete prev;
+  }
+  std::cout << "La mémoire système a été rendue." << std::endl;
+  return 1;
+}
+
+
+
+// F() **** Fonction de tir / gestion de liste chainée ***
+
+int shoot (vaisseau Vaisseau, rocket **pos_rocket, rocket **lst_start) {
+
+  if (*lst_start == NULL) {
+    *pos_rocket = new rocket;
+    (*pos_rocket)->init(Vaisseau);
+    *lst_start = *pos_rocket;
+  }
+  else {
+    (*pos_rocket)->next = new rocket;
+    *pos_rocket = (*pos_rocket)->next;
+    (*pos_rocket)->init(Vaisseau);
+  }
+  
+  return 1;
+}
+
+	    
+
+	    
 /*****************************
  *          M A I N          *
  *****************************/
 
 int main() {
   
+  const int DELTA    = 5;    // Nombre de pixels par déplacement du vaisseau
+  const int SCREEN_W = 640;  // Largeur de fenêtre
+  const int SCREEN_H = 480;  // Hauteur de fenêtre
+  
+  const std::string windowTitle = "Mon titre, blah!";
+  const std::string bgPath = "images/fond.png";
+  const std::string playerPath = "images/player.png";
+  const std::string greenRocketPath = "images/laser_vert.png";
+  
   SDL_Window 	*mainWindow = NULL;
   SDL_Renderer 	*mainRenderer = NULL;
   SDL_Texture	*backgroundTex = NULL;
   SDL_Texture	*playerTex = NULL;
+  SDL_Texture   *greenRocketTex = NULL;
   
-  vaisseau Vaisseau;
-
+  vaisseau       Vaisseau;
+  
+  rocket        *rocket_lst_start = NULL;
+  rocket        *rocket_lst_pos   = NULL;
+  rocket        *rocket_driver    = NULL;
+  
   const Uint8 *keyState = SDL_GetKeyboardState(NULL); 
-  SDL_Event    event;
   
   // Initialisation de SDL
   if(SDL_Init(SDL_INIT_VIDEO)<0) {
@@ -162,62 +153,67 @@ int main() {
   }
   
   // Chargement des textures
-  backgroundTex 	= LoadSDLSurface(bgPath.c_str(), mainRenderer);
-  playerTex 	= LoadSDLSurface(playerPath.c_str(), mainRenderer);
+  backgroundTex  = loadTexture(bgPath.c_str(), mainRenderer);
+  playerTex 	 = loadTexture(playerPath.c_str(), mainRenderer);
+  greenRocketTex = loadTexture(greenRocketPath.c_str(), mainRenderer);
   
-  if ((backgroundTex == NULL) | (playerTex == NULL)) {
+  if ((backgroundTex == NULL) | (playerTex == NULL) | (greenRocketTex == NULL)) {
     SDL_DestroyRenderer(mainRenderer);
     SDL_DestroyWindow(mainWindow);
-    ShowSDLError("LoadSDLSurface");
+    ShowSDLError("loadTexture");
     exit(EXIT_FAILURE);
   }
-  
-  Vaisseau.init(playerTex, 1);
+
+  //initiallisation du vaisseau et positionnement de départ!
+  startPosition(SCREEN_W, SCREEN_H, &Vaisseau, PLAYER);
   
   // Boucle principale
-  printf("Appuyez sur la touche ESC pour quitter...");
+  std::cout << "lst_start = " << rocket_lst_start << std::endl << "Appuyez sur la touche ESC pour quitter..." << std::endl;
   
   while (!keyState[SDL_SCANCODE_ESCAPE]) {
     
     SDL_RenderClear(mainRenderer);
     SDL_RenderCopy(mainRenderer, backgroundTex, NULL, NULL);		 	// Background Set
-    RenderTexture(playerTex, mainRenderer, Vaisseau.getx(), Vaisseau.gety());	// Affiche le vaisseau
+    renderTexture(playerTex, mainRenderer, Vaisseau.getx(), Vaisseau.gety());	// Affiche le vaisseau
+
+    rocket_driver = rocket_lst_start;
+    while(rocket_driver != NULL) { // Affichage des rockets si il y en a;
+      renderTexture(greenRocketTex, mainRenderer, rocket_driver->getx(), rocket_driver->gety(), 1, 3);
+      rocket_driver = rocket_driver->next;
+    }
+    
     SDL_RenderPresent(mainRenderer);
     SDL_Delay(10);
 
-    SDL_PollEvent(&event);
     SDL_PumpEvents();    // Met à jour la table : 'const Uint8 *keyState = SDL_GetKeyboardState[NULL]'
-    if (keyState[SDL_SCANCODE_ESCAPE]) {
-      printf("Touche 'ESC' pressée\n");
-    }
     if (keyState[SDL_SCANCODE_UP]) {
-      printf("Touche 'UP' pressée\n");
-      Vaisseau.sety(-DELTA);
+      Vaisseau.movey(-DELTA);
     }
     if (keyState[SDL_SCANCODE_DOWN]) {
-      printf("Touche 'DOWN' pressée\n");
-      Vaisseau.sety(+DELTA);
+      Vaisseau.movey(+DELTA);
     }
     if (keyState[SDL_SCANCODE_LEFT]) {
-      printf("Touche 'LEFT' pressée\n");
-      Vaisseau.setx(-DELTA);
+      Vaisseau.movex(-DELTA);
     }
     if (keyState[SDL_SCANCODE_RIGHT]) {
-      printf("Touche 'RIGHT' pressée\n");
-      Vaisseau.setx(+DELTA);
+      Vaisseau.movex(+DELTA);
     }
-    
-    //if (event.type == SDL_KEYDOWN) {
-    //  printf("Touche enfoncée\n");
+    if(keyState[SDL_SCANCODE_SPACE]) {
+      shoot(Vaisseau, &rocket_lst_pos, &rocket_lst_start);
+      std::cout << "Fire..." <<std::endl;
+    }
       
-
   }
   
   
   printf("Programme en cours de fermeture...\n");
+
+  clearRockets(rocket_lst_start);
+
   SDL_DestroyTexture(backgroundTex);
   SDL_DestroyRenderer(mainRenderer);
   SDL_DestroyWindow(mainWindow);
   SDL_Quit();
+  IMG_Quit();
   exit(EXIT_SUCCESS);
 }

@@ -1,12 +1,22 @@
-#OBJS: Fichiers à compiler
-OBJS = main.cc
+CXX=g++
+CXXFLAGS=-Wall -std=c++11
+LIBS=-lSDL2 -lSDL2_image
 
+# Autre possibilité: tu as une variable dans laquelle tu listes tes sources
+SOURCES=main.cc vaisseau.cc rocket.cc
+# et tu a une autre variable qui est initialisée à ta liste des sources mais en changeant l'extension (on passe de .cc à .o)
+# si jamais dans $(SOURCES) il y a autre chose qu'un .cc, il sera présent dans $(OBJECTS) sans aucune modification de nom.
+OBJECTS=$(SOURCES:.cc=.o)
 
-FLAGS = -Wall -lSDL2 -o
+all: blah
 
-#OUTPUT: Nom du fichier de sortie
-OUTPUT = a.out
+# Et comme dépendance, on peut bien sûr avoir des variables !
+blah: $(OBJECTS)
+	$(CXX) $^ -o $@ $(LIBS)
 
-#Compilation 
-all : $(OBJS)
-	g++ $(OBJS) $(FLAGS) $(OUTPUT)
+clean:
+	rm -f *.o
+
+distclean: clean
+	rm -f blah
+
