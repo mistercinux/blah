@@ -57,12 +57,12 @@ void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y) {
 void startPosition(int xscreen, int yscreen, vaisseau *Vaisseau, int who) {
   Vaisseau->setx((xscreen / 2) - (Vaisseau->x_size / 2)); 
   Vaisseau->sety(yscreen - (2*Vaisseau->y_size));         
-  Vaisseau->setx_max(xscreen - Vaisseau->x_size);         
-  Vaisseau->sety_max(yscreen - Vaisseau->y_size);
+  Vaisseau->setx_max(xscreen - Vaisseau->x_size);
+  Vaisseau->sety_max(yscreen - Vaisseau->y_size); 
   Vaisseau->setdir(who);
 }
 
-// F() **** Nettoyage mémoire Rockets ****
+// F() **** Nettoyage mémoire des Rockets restants ****
 int clearRockets (rocket *lst) {
 
   rocket *prev = NULL;
@@ -88,7 +88,7 @@ int shoot (vaisseau Vaisseau, rocket **pos_rocket, rocket **lst_start) {
     (*pos_rocket)->init(Vaisseau);
     *lst_start = *pos_rocket;
   }
-  else {
+  else if (((*pos_rocket)->intervalCheck()) == 1) {
     (*pos_rocket)->next = new rocket;
     *pos_rocket = (*pos_rocket)->next;
     (*pos_rocket)->init(Vaisseau);
@@ -97,7 +97,48 @@ int shoot (vaisseau Vaisseau, rocket **pos_rocket, rocket **lst_start) {
   return 1;
 }
 
-	    
+
+// F() **** Déplacement des rockets et vaisseaux ennemis ****
+int mapIncrementation (rocket **rocketLstStart, int screenW, int screenH) { // Inclure les vaisseaux ennemis par la suite
+
+  rocket *rocketDriver  = NULL;
+  rocket *prevRocket    = NULL;
+  
+  rocketDriver = *rocketLstStart;
+  prevRocket   = *rocketLstStart;
+    
+  if(*rocketLstStart == NULL) {
+    return 1;
+  }
+  
+  // Boucle de gestion des rockets*
+  while (rocketDriver != NULL) {
+    
+    rocketDriver->move();
+    //      std::cout << "déplacement de rocket: y = " << rocketDriver->gety() << std::endl; // debug
+    
+    if ((rocketDriver->gety() <= (0 - rocketDriver->getsizex())) | (rocketDriver->gety() >= screenH)) {
+      
+      rocketDriver = rocketDriver->next;
+      if (rocketDriver == NULL) {
+	std::cout << "mapIncrementation: Dernière roquette: &rocketDriver = " << rocketDriver << std::endl;
+	std::cout << "mapIncrementation: Reinitialisation de la liste..." << std::endl;
+	*rocketLstStart = NULL;
+      }
+      
+      if (prevRocket == *rocketLstStart) { *rocketLstStart = rocketDriver; }
+      delete prevRocket;
+      std::cout << "mapIncrementation: Roquette effacée" << std::endl;
+      prevRocket = rocketDriver;
+    }
+    
+    else { rocketDriver = rocketDriver->next; }
+    
+  }
+  
+  return 1;
+}
+
 
 	    
 /*****************************
@@ -106,7 +147,7 @@ int shoot (vaisseau Vaisseau, rocket **pos_rocket, rocket **lst_start) {
 
 int main() {
   
-  const int DELTA    = 5;    // Nombre de pixels par déplacement du vaisseau
+  const int DELTA    = 10;    // Nombre de pixels par déplacement du vaisseau
   const int SCREEN_W = 640;  // Largeur de fenêtre
   const int SCREEN_H = 480;  // Hauteur de fenêtre
   
@@ -166,8 +207,11 @@ int main() {
 
   //initiallisation du vaisseau et positionnement de départ!
   startPosition(SCREEN_W, SCREEN_H, &Vaisseau, PLAYER);
+
   
-  // Boucle principale
+  // Boucle principale //
+  /*********************/
+
   std::cout << "lst_start = " << rocket_lst_start << std::endl << "Appuyez sur la touche ESC pour quitter..." << std::endl;
   
   while (!keyState[SDL_SCANCODE_ESCAPE]) {
@@ -178,31 +222,32 @@ int main() {
 
     rocket_driver = rocket_lst_start;
     while(rocket_driver != NULL) { // Affichage des rockets si il y en a;
-      renderTexture(greenRocketTex, mainRenderer, rocket_driver->getx(), rocket_driver->gety(), 1, 3);
+      renderTexture(greenRocketTex, mainRenderer, rocket_driver->getx(), rocket_driver->gety(), rocket_driver->getsizex(), rocket_driver->getsizey());
       rocket_driver = rocket_driver->next;
     }
     
     SDL_RenderPresent(mainRenderer);
-    SDL_Delay(10);
-
+    SDL_Delay(5); // 10 est une valeur correcte
     SDL_PumpEvents();    // Met à jour la table : 'const Uint8 *keyState = SDL_GetKeyboardState[NULL]'
-    if (keyState[SDL_SCANCODE_UP]) {
-      Vaisseau.movey(-DELTA);
+    
+    if (keyState[SDL_SCANCODE_DOWN]) {  // UP    // J'ai testé d'inversé l'ordre des vérifications 
+      Vaisseau.movey(+DELTA);           // -     // Et le problème du SPACE + UP + LEFT subsiste
+    }                                            // Peut être à cause des valeurs du tableau keyState[];
+    if (keyState[SDL_SCANCODE_UP]) {    //DOWN   // la touche A ne pose aucun souci pour tirer (qwerty)! WTF?
+      Vaisseau.movey(-DELTA);           // +     // En fait... Ce problème est du à la fabrication du clavier
+    }                                            // Sur un clavier externe cela devrait fonctionner. 
+    if (keyState[SDL_SCANCODE_RIGHT]) { //LEFT
+      Vaisseau.movex(+DELTA);           //-
     }
-    if (keyState[SDL_SCANCODE_DOWN]) {
-      Vaisseau.movey(+DELTA);
+    if (keyState[SDL_SCANCODE_LEFT]) {  //RIGHT
+      Vaisseau.movex(-DELTA);           //+
     }
-    if (keyState[SDL_SCANCODE_LEFT]) {
-      Vaisseau.movex(-DELTA);
-    }
-    if (keyState[SDL_SCANCODE_RIGHT]) {
-      Vaisseau.movex(+DELTA);
-    }
-    if(keyState[SDL_SCANCODE_SPACE]) {
+    if (keyState[SDL_SCANCODE_SPACE]) {
       shoot(Vaisseau, &rocket_lst_pos, &rocket_lst_start);
-      std::cout << "Fire..." <<std::endl;
     }
-      
+    
+    mapIncrementation( &rocket_lst_start, SCREEN_W, SCREEN_H);
+    
   }
   
   

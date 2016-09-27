@@ -25,6 +25,8 @@ public:
   void setx(int x) { posx = x; }
   void sety(int y) { posy = y; }
 
+  void setx_min(int xmin) { posx_min = xmin; }
+  void sety_min(int ymin) { posy_min = ymin; }
   void setx_max(int xmax) { posx_max = xmax; }
   void sety_max(int ymax) { posy_max = ymax; }
   
