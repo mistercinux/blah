@@ -1,43 +1,30 @@
 #ifndef vaisseau_h
 #define vaisseau_h
+#include "object.h"
 
 #define PLAYER    -1
 #define COMPUTER   1
 
-class vaisseau {
+class vaisseau: public Object {
   
-  int posx;
-  int posy;
-  int posx_min;
-  int posx_max;
-  int posy_min;
-  int posy_max;
-  int direction; // pour le joueur: -1 (vers le haut), pour les autres +1 (vers le bas)
+    int player;     //joueur = 1; ennemis = 0;
+    
+    public:
   
-public:
+    void setx(int x_) { posx = x_; }
+    void sety(int y_) { posy = y_; }
+
+    void setxMin(int xmin) { posxMin = xmin; }
+    void setyMin(int ymin) { posyMin = ymin; }
+    void setxMax(int xmax) { posxMax = xmax; }
+    void setyMax(int ymax) { posyMax = ymax; }
   
-  int x_size;
-  int y_size;
-
-  int getx( )  { return posx; }
-  int gety( )  { return posy; }
-
-  void setx(int x) { posx = x; }
-  void sety(int y) { posy = y; }
-
-  void setx_min(int xmin) { posx_min = xmin; }
-  void sety_min(int ymin) { posy_min = ymin; }
-  void setx_max(int xmax) { posx_max = xmax; }
-  void sety_max(int ymax) { posy_max = ymax; }
-  
-  void movex(int delta);
-  void movey(int delta);
-
-  int getdir()  { return direction; }
-  void setdir(int dir) { direction = dir; } // PLAYER ou COMPUTER
-
-  vaisseau();
-  ~vaisseau();
+    void move(int x_, int y_);
+    void setDirY(int dirx) { directionX = dirx; } // PLAYER ou COMPUTER
+    void start (int player_, int screenW_, int screenH_);
+    
+    vaisseau();
+    ~vaisseau();
   
 };
 
