@@ -5,13 +5,10 @@ vaisseau::vaisseau() {
 
     width   = 40;
     height  = 80;
-  
     posx    =  0; 
     posy    =  0; 
-  
     posxMin =  0;
     posxMax =  0;
-  
     posyMin =  0;
     posyMax =  0;
 
@@ -34,25 +31,25 @@ void vaisseau::move(int x_, int y_) {
     {
         if (x_ > 0) 
         {
-            if ((posx + x_) <= posxMax) { posx += x_; }
+            if ((posx + x_) <= posxMax) { posx += (speed * x_); }
         }
         else if (x_ < 0)
         {
-            if((posx + x_) >= posxMin) { posx += x_; }	  
+            if ((posx + x_) >= posxMin) { posx += (speed * x_); }	  
         }
 
         if (y_ > 0) 
         {
-            if ((posy + y_) <= posyMax) { posy += y_; }
+            if ((posy + y_) <= posyMax) { posy += (speed * y_); }
         }
         else if (y_ < 0) 
         {
-            if((posy + y_) >= posyMin) { posy += y_; }  
+            if ((posy + y_) >= posyMin) { posy += (speed * y_); }  
         }
   }
 }
 
-void vaisseau::start(int player_, int screenW, int screenH)
+void vaisseau::start(int player_, int screenW, int screenH) // player_ = 1 si c'est le joueur; 0 sinon;
 {
     if (player_ == 1)    
     {

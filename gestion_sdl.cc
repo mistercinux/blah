@@ -1,7 +1,6 @@
 #include "gestion_sdl.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <string>
 
 SDL_Texture* gestion_sdl::loadTexture(const std::string& path)
 {

@@ -6,7 +6,6 @@
 #include "rocket.h"
 #include "gestion_sdl.h"
 
-
 // F() **** Préparation de l'affichage de la texture (Avec largeur et hauteur) ****
 void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y, int w, int h) {
 
@@ -109,28 +108,19 @@ else { rocketDriver = rocketDriver->next; }
 
 int main() {
 
-  const int SCREEN_W = 640;  // Largeur de fenêtre
-  const int SCREEN_H = 480;  // Hauteur de fenêtre
-
-    int keyMovX =0;
-    int keyMovY =0;
-
   const std::string windowTitle = "Mon titre, blah!";
   const std::string bgPath = "images/fond.png";
   const std::string playerPath = "images/player.png";
   const std::string greenRocketPath = "images/laser_vert.png";
 
-//  SDL_Window 	*mainWindow = NULL;
-//  SDL_Renderer 	*mainRenderer = NULL;
-//  SDL_Texture	*backgroundTex = NULL;
-//  SDL_Texture	*playerTex = NULL;
-//  SDL_Texture   *greenRocketTex = NULL;
-
+  int playerMovX = 0;
+  int playerMovY = 0;
+  
   vaisseau       Vaisseau;
 
   std::forward_list<rocket> rocketLst;
   
-    gestion_sdl mysdl;
+  gestion_sdl mysdl;
   
   rocket        *rocket_lst_start = NULL;
   rocket        *rocket_lst_pos   = NULL;
@@ -139,22 +129,19 @@ int main() {
   const Uint8 *keyState = SDL_GetKeyboardState(NULL); 
 
   // Initialisation de SDL
-    mysdl.init((&bgPath)->c_str(), (&playerPath)->c_str(), (&greenRocketPath)->c_str());
-  
-  //initiallisation du vaisseau et positionnement de départ!
-  Vaisseau.start(1, mysdl.getWidth(), mysdl.getHeight()); //1 = player
+  mysdl.init((&bgPath)->c_str(), (&playerPath)->c_str(), (&greenRocketPath)->c_str());
+  Vaisseau.start(1, mysdl.getWidth(), mysdl.getHeight());
 
 
   // Boucle principale //
   /*********************/
 
-  std::cout << "lst_start = " << rocket_lst_start << std::endl << "Appuyez sur la touche ESC pour quitter..." << std::endl;
+  std::cout << "Appuyez sur la touche ESC pour quitter..." << std::endl;
 
   while (!keyState[SDL_SCANCODE_ESCAPE]) {
 
-    mysdl.renderClear();
+    mysdl.renderClear();                                                                        // Vide le renderer
     SDL_RenderCopy(mysdl.mainRenderer__, mysdl.backgroundTex__, NULL, NULL);		 	// Background Set
-
     renderTexture(mysdl.playerTex__, mysdl.mainRenderer__, Vaisseau.getx(), Vaisseau.gety());	// Affiche le vaisseau
 
     rocket_driver = rocket_lst_start;
@@ -164,28 +151,29 @@ int main() {
     }
 
     SDL_RenderPresent(mysdl.mainRenderer__);
-    SDL_Delay(5);                               // 10 est une valeur correcte
-    SDL_PumpEvents();                           // Met à jour la table : 'const Uint8 *keyState = SDL_GetKeyboardState[NULL]'
+    SDL_Delay(10); // 10 est une valeur correcte
+    SDL_PumpEvents();    // Met à jour la table : 'const Uint8 *keyState = SDL_GetKeyboardState[NULL]'
 
-    if (keyState[SDL_SCANCODE_DOWN]) {  
-      keyMovY += Vaisseau.getSpeed(); 
-    }                                  
-    if (keyState[SDL_SCANCODE_UP]) {   
-      keyMovY -= Vaisseau.getSpeed();     
-    }                                  
-    if (keyState[SDL_SCANCODE_RIGHT]) {
-      keyMovX += Vaisseau.getSpeed();
+    if (keyState[SDL_SCANCODE_DOWN]) {
+	playerMovY += 1;
     }
-    if (keyState[SDL_SCANCODE_LEFT]) {
-      keyMovX -= Vaisseau.getSpeed();           
+    if (keyState[SDL_SCANCODE_UP]) {
+    	 playerMovY -= 1;   
+    }                              
+    if (keyState[SDL_SCANCODE_RIGHT]) { 
+    	playerMovX += 1;
+    }
+    if (keyState[SDL_SCANCODE_LEFT]) { 
+       	playerMovX -= 1;
     }
     if (keyState[SDL_SCANCODE_SPACE]) {
       shoot(Vaisseau, &rocket_lst_pos, &rocket_lst_start);
     }
 
-    Vaisseau.move(keyMovX, keyMovY);
-    mapIncrementation( &rocket_lst_start, SCREEN_W, SCREEN_H);
-    keyMovX = keyMovY = 0;
+    Vaisseau.move(playerMovX, playerMovY);
+    mapIncrementation( &rocket_lst_start, mysdl.getWidth(), mysdl.getHeight());
+    playerMovX = playerMovY = 0;
+
   }
 
 
