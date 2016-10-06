@@ -1,5 +1,7 @@
+#include <list>
 #include "vaisseau.h"
 #include "object.h"
+#include "rocket.h"
 
 vaisseau::vaisseau() {
 
@@ -63,3 +65,23 @@ void vaisseau::start(int player_, int screenW, int screenH) // player_ = 1 si c'
 
 }
 
+int vaisseau::shoot(std::list<rocket>& rocketLst)
+{
+    
+    std::list<rocket>::iterator rocketIt;
+    
+    rocketIt = rocketLst.end();
+    --rocketIt;
+
+    if(rocketLst.size() > 0)
+    {
+        if (rocketIt->intervalCheck() == -1) { return 0; }
+    }   
+     
+    rocketLst.push_back(rocketLst.back());
+    //rocketLst.push_back({0, 0});
+
+    ++rocketIt;
+    rocketIt->init(posx, posy, width, directionY);
+    return 1;
+}

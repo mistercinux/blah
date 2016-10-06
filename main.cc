@@ -1,7 +1,7 @@
 #include <iostream>	
 #include <SDL2/SDL.h>       // Les fonctions commencent par SDL
 #include <SDL2/SDL_image.h> // Les fonctions commencent par IMG
-#include <forward_list>
+#include <list>
 #include "vaisseau.h"
 #include "rocket.h"
 #include "gestion_sdl.h"
@@ -23,81 +23,23 @@ void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y) {
 }
 
 
-// F() **** Nettoyage mémoire des Rockets restants ****
-int clearRockets (rocket *lst) {
-
-  rocket *prev = NULL;
-
-  while (lst != NULL) {
-    prev = lst;
-    lst = lst->next;
-    std::cout << "Delete: " << prev << std::endl;
-    delete prev;
-  }
-  std::cout << "La mémoire système a été rendue." << std::endl;
-  return 1;
-}
-
-
-
-// F() **** Fonction de tir / gestion de liste chainée ***
-
-int shoot (vaisseau Vaisseau, rocket **pos_rocket, rocket **lst_start) {
-
-  if (*lst_start == NULL) {
-    *pos_rocket = new rocket;
-    (*pos_rocket)->init(Vaisseau);
-    *lst_start = *pos_rocket;
-  }
-  else if (((*pos_rocket)->intervalCheck()) == 1) {
-    (*pos_rocket)->next = new rocket;
-    *pos_rocket = (*pos_rocket)->next;
-    (*pos_rocket)->init(Vaisseau);
-  }
-
-  return 1;
-}
-
-
 // F() **** Déplacement des rockets et vaisseaux ennemis ****
-int mapIncrementation (rocket **rocketLstStart, int screenW, int screenH) { // Inclure les vaisseaux ennemis par la suite
+int mapIncrementation (std::list<rocket>& rocketLst, int screenW, int screenH) { // Inclure les vaisseaux ennemis par la suite
 
-  rocket *rocketDriver  = NULL;
-  rocket *prevRocket    = NULL;
+    std::list<rocket>::iterator rocketIt;
 
-  rocketDriver = *rocketLstStart;
-  prevRocket   = *rocketLstStart;
+    if(rocketLst.size() == 0) { return 1; }
 
-  if(*rocketLstStart == NULL) {
-    return 1;
-  }
-
-  // Boucle de gestion des rockets*
-  while (rocketDriver != NULL) {
-
-    rocketDriver->move();
-    //      std::cout << "déplacement de rocket: y = " << rocketDriver->gety() << std::endl; // debug
-
-    if ((rocketDriver->gety() <= (0 - rocketDriver->getWidth())) | (rocketDriver->gety() >= screenH)) {
-
-      rocketDriver = rocketDriver->next;
-      if (rocketDriver == NULL) {
-	std::cout << "mapIncrementation: Dernière roquette: &rocketDriver = " << rocketDriver << std::endl;
-	std::cout << "mapIncrementation: Reinitialisation de la liste..." << std::endl;
-	*rocketLstStart = NULL;
-      }
-
-      if (prevRocket == *rocketLstStart) { *rocketLstStart = rocketDriver; }
-      delete prevRocket;
-      std::cout << "mapIncrementation: Roquette effacée" << std::endl;
-      prevRocket = rocketDriver;
+    for(rocketIt = rocketLst.begin(); rocketIt != rocketLst.end(); ++rocketIt)
+    {
+        rocketIt->move();
+        if ((rocketIt->gety() <= (0 - rocketIt->getHeight())) | (rocketIt->gety() >= screenH)) 
+        { 
+            rocketIt = rocketLst.erase(rocketIt);
+        }
     }
 
-else { rocketDriver = rocketDriver->next; }
-
-  }
-
-  return 1;
+    return 1;
 }
 
 
@@ -108,78 +50,70 @@ else { rocketDriver = rocketDriver->next; }
 
 int main() {
 
-  const std::string windowTitle = "Mon titre, blah!";
-  const std::string bgPath = "images/fond.png";
-  const std::string playerPath = "images/player.png";
-  const std::string greenRocketPath = "images/laser_vert.png";
+    const std::string windowTitle = "Mon titre, blah!";
+    const std::string bgPath = "images/fond.png";
+    const std::string playerPath = "images/player.png";
+    const std::string greenRocketPath = "images/laser_vert.png";
 
-  int playerMovX = 0;
-  int playerMovY = 0;
+    int playerMovX = 0;
+    int playerMovY = 0;
   
-  vaisseau       Vaisseau;
+    vaisseau                    Vaisseau;
+    std::list<rocket>           rocketLst;
+    std::list<rocket>::iterator rocketIt;
+    gestion_sdl                 mysdl;
 
-  std::forward_list<rocket> rocketLst;
-  
-  gestion_sdl mysdl;
-  
-  rocket        *rocket_lst_start = NULL;
-  rocket        *rocket_lst_pos   = NULL;
-  rocket        *rocket_driver    = NULL;
+    const Uint8 *keyState = SDL_GetKeyboardState(NULL); 
 
-  const Uint8 *keyState = SDL_GetKeyboardState(NULL); 
-
-  // Initialisation de SDL
-  mysdl.init((&bgPath)->c_str(), (&playerPath)->c_str(), (&greenRocketPath)->c_str());
-  Vaisseau.start(1, mysdl.getWidth(), mysdl.getHeight());
+    // Initialisation de SDL
+    mysdl.init((&bgPath)->c_str(), (&playerPath)->c_str(), (&greenRocketPath)->c_str());
+    Vaisseau.start(1, mysdl.getWidth(), mysdl.getHeight());
 
 
-  // Boucle principale //
-  /*********************/
+    // Boucle principale //
+    /*********************/
 
-  std::cout << "Appuyez sur la touche ESC pour quitter..." << std::endl;
+    std::cout << "Appuyez sur la touche ESC pour quitter..." << std::endl;
 
-  while (!keyState[SDL_SCANCODE_ESCAPE]) {
+    while (!keyState[SDL_SCANCODE_ESCAPE]) {
 
-    mysdl.renderClear();                                                                        // Vide le renderer
-    SDL_RenderCopy(mysdl.mainRenderer__, mysdl.backgroundTex__, NULL, NULL);		 	// Background Set
-    renderTexture(mysdl.playerTex__, mysdl.mainRenderer__, Vaisseau.getx(), Vaisseau.gety());	// Affiche le vaisseau
+        mysdl.renderClear();                                                                        // Vide le renderer
+        SDL_RenderCopy(mysdl.mainRenderer__, mysdl.backgroundTex__, NULL, NULL);		 	// Background Set
+        renderTexture(mysdl.playerTex__, mysdl.mainRenderer__, Vaisseau.getx(), Vaisseau.gety());	// Affiche le vaisseau
 
-    rocket_driver = rocket_lst_start;
-    while(rocket_driver != NULL) { // Affichage des rockets si il y en a;
-      renderTexture(mysdl.greenRocketTex__, mysdl.mainRenderer__, rocket_driver->getx(), rocket_driver->gety(), rocket_driver->getWidth(), rocket_driver->getHeight());
-      rocket_driver = rocket_driver->next;
-    }
+        for(rocketIt = rocketLst.begin(); rocketIt != rocketLst.end(); ++rocketIt)
+        {
+            renderTexture(mysdl.greenRocketTex__, mysdl.mainRenderer__, rocketIt->getx(), rocketIt->gety(), rocketIt->getWidth(), rocketIt->getHeight());
+        }
 
-    SDL_RenderPresent(mysdl.mainRenderer__);
-    SDL_Delay(10); // 10 est une valeur correcte
-    SDL_PumpEvents();    // Met à jour la table : 'const Uint8 *keyState = SDL_GetKeyboardState[NULL]'
+        SDL_RenderPresent(mysdl.mainRenderer__);
+        SDL_Delay(10); // 10 est une valeur correcte
+        SDL_PumpEvents();    // Met à jour la table : 'const Uint8 *keyState = SDL_GetKeyboardState[NULL]'
 
-    if (keyState[SDL_SCANCODE_DOWN]) {
-	playerMovY += 1;
-    }
-    if (keyState[SDL_SCANCODE_UP]) {
-    	 playerMovY -= 1;   
-    }                              
-    if (keyState[SDL_SCANCODE_RIGHT]) { 
-    	playerMovX += 1;
-    }
-    if (keyState[SDL_SCANCODE_LEFT]) { 
-       	playerMovX -= 1;
-    }
-    if (keyState[SDL_SCANCODE_SPACE]) {
-      shoot(Vaisseau, &rocket_lst_pos, &rocket_lst_start);
-    }
+        if (keyState[SDL_SCANCODE_DOWN]) {
+	    playerMovY += 1;
+        }
+        if (keyState[SDL_SCANCODE_UP]) {
+    	    playerMovY -= 1;   
+        }                              
+        if (keyState[SDL_SCANCODE_RIGHT]) { 
+            playerMovX += 1;
+        }
+        if (keyState[SDL_SCANCODE_LEFT]) { 
+       	    playerMovX -= 1;
+        }
+        if (keyState[SDL_SCANCODE_SPACE]) {
+            Vaisseau.shoot(rocketLst);  //XXX Pourquoi pas de &rocketLst ?
+        }
 
     Vaisseau.move(playerMovX, playerMovY);
-    mapIncrementation( &rocket_lst_start, mysdl.getWidth(), mysdl.getHeight());
+    mapIncrementation( rocketLst, mysdl.getWidth(), mysdl.getHeight() );
     playerMovX = playerMovY = 0;
 
   }
 
 
   printf("Programme en cours de fermeture...\n");
-
-  clearRockets(rocket_lst_start);
 
   exit(EXIT_SUCCESS);
 }

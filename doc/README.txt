@@ -1,27 +1,40 @@
+###############
+#   B L A H   #
+###############
+
+
 Principe du jeu : 
+'''''''''''''''''
+- Un véhicule à définir se défend contre des assaillants. 
+- Des caisses de bonus et malus peuvent aparaitre 
+  (ainsi que des caisses '?' dont on ignore le bonus/malus).
+- Les ennemis se dirigent verticalement uniquement et peuvent bénéficier des bunus/malus si ils tombent dessus.
 
-slick scroller ... shooter (genre chromium-bsu)
 
+partie graphique :
+''''''''''''''''''
+- lib : SDL2
 
-partie graphique lib : SDL2
 
 A modifier: 
+'''''''''''
+- push_back(). Comment initialiser simplement?
 
-	utiliser std::list ou std::forward_list au lieu de faire le dev de la liste chainée comme en C!
 
-Avancement: 
-	Affichage fenetre avec fond d'écran avec le vaisseau du joueur
-	le vaisseau se déplace et tire.
+Avancement:
+''''''''''' 
+- Affichage fenetre avec fond d'écran avec le vaisseau du joueur
+- le vaisseau du joueur se déplace et tire correctement.
 
 Compilation:
+''''''''''''
 	Utilisation d'un Makefile.
 
 
 Liens :
-https://wiki.libsdl.org
-http://www.willusher.io/sdl2%20tutorials/2013/08/17/lesson-1-hello-world
-http://cpp.developpez.com/cours/cpp/
+'''''''
+	https://wiki.libsdl.org
+	http://www.willusher.io/sdl2%20tutorials/2013/08/17/lesson-1-hello-world
+	http://cpp.developpez.com/cours/cpp/
 
-Dernières modifs:
-	Modifications en fonction des review de doomy :) 
  

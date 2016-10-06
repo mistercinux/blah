@@ -3,19 +3,17 @@
 #include "rocket.h"
 #include "object.h"
 
-void rocket::init(vaisseau Vaisseau) {
+void rocket::init(int x_, int y_, int shipWidth_, int directionY_) {
 
-    width = 3;
-    height = 8;
-    posx = (Vaisseau.getx() + ((Vaisseau.getWidth()) / 2) - 1);
-    posy = (Vaisseau.gety());
+    width = 4;	// Largeurt de roquette
+    height = 8; // Hauteur de roquette
+    posx = (x_ + (shipWidth_ / 2) - 1);
+    posy = y_;
     starty = posy;
     startx = posx;
-    directionY = Vaisseau.getDirY();
+    directionY = directionY_; 
     speed = ROCKET_SPEED;
     interval = ROCKET_INTERVAL;
-
-    next = NULL;
 }
 
 // Retourne 1 si l'interval entre 2 tirs est respecté et -1 si non.
@@ -31,3 +29,4 @@ int rocket::intervalCheck() {
     if ((i*i) >= (interval*interval)) { return  1; }
     else { return -1; }
 }
+
