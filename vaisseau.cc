@@ -78,8 +78,8 @@ int vaisseau::shoot(std::list<rocket>& rocketLst)
         if (rocketIt->intervalCheck() == -1) { return 0; }
     }   
      
-    rocketLst.push_back(rocketLst.back());
-    //rocketLst.push_back({0, 0});
+    //rocketLst.push_back(rocketLst.back());
+    rocketLst.push_back(rocketLst.front());
 
     ++rocketIt;
     rocketIt->init(posx, posy, width, directionY);
