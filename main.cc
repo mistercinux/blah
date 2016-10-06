@@ -110,10 +110,7 @@ int main() {
     mapIncrementation( rocketLst, mysdl.getWidth(), mysdl.getHeight() );
     playerMovX = playerMovY = 0;
 
-  }
+    }
 
-
-  printf("Programme en cours de fermeture...\n");
-
-  exit(EXIT_SUCCESS);
+    exit(EXIT_SUCCESS);
 }

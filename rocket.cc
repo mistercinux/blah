@@ -3,7 +3,7 @@
 #include "rocket.h"
 #include "object.h"
 
-void rocket::init(int x_, int y_, int shipWidth_, int directionY_) {
+rocket::rocket(int x_, int y_, int shipWidth_, int directionY_) {
 
     width = 4;	// Largeurt de roquette
     height = 8; // Hauteur de roquette
