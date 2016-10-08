@@ -3,25 +3,42 @@
 #include "object.h"
 #include "rocket.h"
 
-vaisseau::vaisseau() {
+vaisseau::vaisseau(int kindOf_, int screenW, int screenH) {
 
-    width   = 40;
-    height  = 80;
-    posx    =  0; 
-    posy    =  0; 
-    posxMin =  0;
-    posxMax =  0;
-    posyMin =  0;
-    posyMax =  0;
+    // Il est pénible de devoir passer en args les dimentions de la fenetre 
+    // à plusieurs méthodes de différentes class. 
+    // Trouver une solution efficace !!! :)
 
+    posx            =        0; 
+    posy            =        0; 
+    posxMin         =        0;
+    posxMax         =        0;
+    posyMin         =        0;
+    posyMax         =        0;
+    kindOf          =  kindOf_; 
+    authorizedMove  =        1;
 
-    directionY      = -1; // PLAYER | COMPUTER (voir header)
-    player          =  1;
-    authorizedMove  =  1;
-    
-    speed = 10;
+    switch (kindOf_)
+    {    
+        case PLAYER:   
+            directionY  = UP;   // PLAYER | COMPUTER (voir header)
+            speed       = 10;
+            width       = 40;
+            height      = 80;
+            posx        = ((screenW / 2) - (width / 2));
+            posy        = (screenH - (2 * height));
+            posxMax     = (screenW - width);
+            posyMax     = (screenH - height);
+            break;
 
+        case HOSTILE:
+            directionY  = DOWN; 
+            speed       = 10;
+            width       = 40;
+            height      = 80;
+            break;
 
+    }
 }
 
 
@@ -51,9 +68,11 @@ void vaisseau::move(int x_, int y_) {
   }
 }
 
-void vaisseau::start(int player_, int screenW, int screenH) // player_ = 1 si c'est le joueur; 0 sinon;
+
+/*
+void vaisseau::start(int who_, int screenW, int screenH) // Who = PLAYER | HOSTILE
 {
-    if (player_ == 1)    
+    if (who_ == PLAYER)    
     {
         posx = ((screenW / 2) - (width / 2));
         posy = (screenH - (2 * height));
@@ -64,6 +83,9 @@ void vaisseau::start(int player_, int screenW, int screenH) // player_ = 1 si c'
 
 
 }
+*/
+
+
 
 int vaisseau::shoot(std::list<rocket>& rocketLst)
 {

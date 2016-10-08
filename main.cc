@@ -58,16 +58,14 @@ int main() {
     int playerMovX = 0;
     int playerMovY = 0;
   
-    vaisseau                    Vaisseau;
     std::list<rocket>           rocketLst;
     std::list<rocket>::iterator rocketIt;
     gestion_sdl                 mysdl;
+    // Initialisation de SDL
+    mysdl.init( (&bgPath)->c_str(), (&playerPath)->c_str(), (&greenRocketPath)->c_str() );
+    vaisseau  Vaisseau( PLAYER, mysdl.getWidth(), mysdl.getHeight() );
 
     const Uint8 *keyState = SDL_GetKeyboardState(NULL); 
-
-    // Initialisation de SDL
-    mysdl.init((&bgPath)->c_str(), (&playerPath)->c_str(), (&greenRocketPath)->c_str());
-    Vaisseau.start(1, mysdl.getWidth(), mysdl.getHeight());
 
 
     // Boucle principale //

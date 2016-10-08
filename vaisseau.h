@@ -4,12 +4,15 @@
 #include "object.h"
 #include "rocket.h"
 
-#define PLAYER    -1
-#define COMPUTER   1
+#define PLAYER   1 
+#define HOSTILE  2
+#define UP      -1
+#define DOWN     1
+
 
 class vaisseau: public Object {
   
-    int player;     //joueur = 1; ennemis = 0;
+    int kindOf;     // PLAYER | HOSTILE
     
     public:
   
@@ -23,10 +26,10 @@ class vaisseau: public Object {
   
     void move(int x_, int y_);
     void setDirY(int dirx) { directionX = dirx; } // PLAYER ou COMPUTER
-    void start (int player_, int screenW_, int screenH_);
+    //void start (int player_, int screenW_, int screenH_);
     int  shoot (std::list<rocket>& rocketLst);
 
-    vaisseau();
+    vaisseau(int, int, int);
     ~vaisseau();
   
 };
