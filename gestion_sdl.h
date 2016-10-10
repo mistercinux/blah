@@ -5,7 +5,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-class sdl_exception: std::exception 
+class sdl_exception: std::exception
 {
     protected:
     std::string msg__;
@@ -27,9 +27,9 @@ class sdl_exception: std::exception
 
 class gestion_sdl
 {
-    int SCREEN_W; 
+    int SCREEN_W;
     int SCREEN_H;
-    
+
     std::string windowTitle;
 
     public:
@@ -38,14 +38,19 @@ class gestion_sdl
     SDL_Texture*    backgroundTex__   = nullptr;
     SDL_Texture*    playerTex__       = nullptr;
     SDL_Texture*    greenRocketTex__  = nullptr;
+    SDL_Texture*    hostileTex__      = nullptr;
 
     SDL_Texture *loadTexture(const std::string& path);
 
     int getWidth()  { return SCREEN_W; }
     int getHeight() { return SCREEN_H; }
-    void init(const std::string& bgPath, const std::string& playerPath, const std::string& greenRocketPath);
+    void init(const std::string& bgPath, const std::string& playerPath, const std::string& hostilePath, const std::string& greenRocketPath);
     void createRenderer();
     void renderClear () { SDL_RenderClear(mainRenderer__); }
+    void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y, int w, int h);
+    void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y);
+
+
 
     ~gestion_sdl ();
 };

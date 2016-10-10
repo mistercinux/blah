@@ -15,10 +15,26 @@ SDL_Texture* gestion_sdl::loadTexture(const std::string& path)
 }
 
 
-void gestion_sdl::init(const std::string& bgPath, const std::string& playerPath, const std::string& greenRocketPath)
+void gestion_sdl::renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y, int w, int h)
+{
+    SDL_Rect destination = { .x=x, .y=y, .w=w, .h=h };
+    SDL_RenderCopy(ren, tex, NULL, &destination);
+}
+
+void gestion_sdl::renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y)
+{
+    SDL_Rect destination = { .x=x, .y=y };
+    // Query texture to get its width and height
+    SDL_QueryTexture(tex, NULL, NULL, &destination.w, &destination.h);
+    SDL_RenderCopy(ren, tex, NULL, &destination);
+}
+
+
+
+void gestion_sdl::init(const std::string& bgPath, const std::string& playerPath,  const std::string& hostilePath, const std::string& greenRocketPath)
 {
     SCREEN_W = 640;
-    SCREEN_H = 480; 
+    SCREEN_H = 480;
     windowTitle  = "Hello World";
 
     if(SDL_Init(SDL_INIT_VIDEO)<0) { throw sdl_exception("SDL_Init"); }
@@ -32,9 +48,10 @@ void gestion_sdl::init(const std::string& bgPath, const std::string& playerPath,
     backgroundTex__  = loadTexture((&bgPath)->c_str());
     playerTex__      = loadTexture((&playerPath)->c_str());
     greenRocketTex__ = loadTexture((&greenRocketPath)->c_str());
+    hostileTex__     = loadTexture((&hostilePath)->c_str());
 }
 
-void gestion_sdl::createRenderer() 
+void gestion_sdl::createRenderer()
 {
     mainRenderer__ = SDL_CreateRenderer(mainWindow__, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (mainRenderer__ == nullptr)

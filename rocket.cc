@@ -9,23 +9,26 @@ rocket::rocket(int x_, int y_, int shipWidth_, int directionY_) {
     height = 8; // Hauteur de roquette
     posx = (x_ + (shipWidth_ / 2) - 1);
     posy = y_;
+    posyMax = 490;
+    posyMin = (0 - height);
+
     starty = posy;
     startx = posx;
-    directionY = directionY_; 
-    speed = ROCKET_SPEED;
-    interval = ROCKET_INTERVAL;
+    directionY = directionY_;
+    speed = 15;
+    interval = 100;
 }
 
 // Retourne 1 si l'interval entre 2 tirs est respecté et -1 si non.
 int rocket::intervalCheck() {
-  
+
   // Cette fonction posera des problèmes lorsque les autres vaisseaux vont tirer aussi si ils sont dans la même liste
   // Peut être faudra-t-il travailler avec 1 liste par vaisseau (liste de listes? :)
-  
+
     int i;
-  
+
     i = (posy - starty);
-    
+
     if ((i*i) >= (interval*interval)) { return  1; }
     else { return -1; }
 }

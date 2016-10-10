@@ -1,7 +1,7 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-class Object 
+class Object
 {
     protected:
     int           posx;
@@ -21,15 +21,17 @@ class Object
 
 
     public:
-    int getx()      { return posx;       }
-    int gety()      { return posy;       }
-    int getWidth()  { return width;      }
-    int getHeight() { return height;     }
-    int getDirX()   { return directionX; }
-    int getDirY()   { return directionY; }
-    int getStartX() { return startx;     }
-    int getStartY() { return starty;     }
-    int getSpeed()  { return speed;      }
+    int getx() const          { return posx;       }
+    int gety() const          { return posy;       }
+    int getPosyMin() const    { return posyMin;    }
+    int getPosyMax() const    { return posyMax;    }
+    int getWidth()  const     { return width;      }
+    int getHeight() const     { return height;     }
+    int getDirX() const       { return directionX; }
+    int getDirY() const       { return directionY; }
+    int getStartX() const     { return startx;     }
+    int getStartY() const     { return starty;     }
+    int getSpeed() const      { return speed;      }
 
 };
 
