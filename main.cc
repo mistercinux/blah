@@ -43,7 +43,7 @@ int main()
 
         mysdl.renderClear();
         // Affichage du background
-        SDL_RenderCopy(mysdl.mainRenderer__, mysdl.backgroundTex__, NULL, NULL)
+        SDL_RenderCopy(mysdl.mainRenderer__, mysdl.backgroundTex__, NULL, NULL);
 
         //Affichage du vaisseau principal
         mysdl.renderTexture(mysdl.playerTex__, mysdl.mainRenderer__, Vaisseau.getx(), Vaisseau.gety());
