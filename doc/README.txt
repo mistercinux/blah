@@ -25,7 +25,8 @@ Avancement:
 - Affichage fenetre avec fond d'écran avec le vaisseau du joueur
 - le vaisseau du joueur se déplace et tire correctement.
 - un vaisseau ennemi est généré automatiquement (toujours au même endroit) et traverse l'ecran
-
+- Les ennemis sont générés à des positions et en quantités aléatoires (quantité entre 1 et maxHostiles(3)
+)
 Compilation:
 ''''''''''''
 	Utilisation d'un Makefile.

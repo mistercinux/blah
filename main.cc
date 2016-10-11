@@ -67,7 +67,7 @@ int main()
         }
 
         SDL_RenderPresent(mysdl.mainRenderer__);
-        SDL_Delay(10); // 10 est une valeur correcte
+        SDL_Delay(50); // 10 est une valeur correcte
 
         // Gestion des évènements associés au clavier
         SDL_PumpEvents();

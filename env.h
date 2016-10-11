@@ -18,21 +18,25 @@ class env
 
     // Paramètres à passer pour la génération de nouveaux vaisseaux
     unsigned int maxHostiles;         // Quantité d'ennemis max (en fonction du level)
-    unsigned int AliveHostiles;       // Quantité d'ennemis actuels
     unsigned int authorizedHostiles;  // Quantité d'ennemis a créer (entre 0 et maxHostileShips inclus)
     unsigned int genInterval;         // nombre de boucles avant nouvelles générations
     unsigned int lastGen;             // incrémenté à chaque tour et remis à 0 lors d'une génération
+    unsigned int playerScore;
 
     public:
+    // Paramètres pour la création de vaisseaux
     int player        = 1;
     int hostile       = 2;
     int greenRocket   = 3;
     int redRocket     = 4;
 
+    // listes
     std::list<rocket>   rocketLst;
     std::list<vaisseau>  shipLst;
 
+    // Méthodes
     int manager();
+    int colisionCheck(rocket& rocket_, vaisseau& vaisseau);
 
     std::string backgroung_img() const    { return bgPath.c_str();          }
     std::string hostile_img() const       { return hostilePath.c_str();     }

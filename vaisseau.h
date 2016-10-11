@@ -6,9 +6,10 @@
 
 class vaisseau: public Object {
 
-    int kindOf;     // PLAYER | HOSTILE
+    int kindOf;     // PLAYER | HOSTILE
     int deltaX;
     int deltaY;
+    int health;
 
     public:
 
