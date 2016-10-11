@@ -2,6 +2,7 @@
 #include "vaisseau.h"
 #include "object.h"
 #include "rocket.h"
+#include <random>
 #include <iostream> // pour tests cout...
 
 vaisseau::vaisseau(int kindOf_, int screenW, int screenH) {
@@ -21,12 +22,14 @@ vaisseau::vaisseau(int kindOf_, int screenW, int screenH) {
     deltaX          =        0;
     deltaY          =        0;
     directionX      =        1;
+    health          =      100;
+
 
     switch (kindOf_)
     {
         case 1:                 // 1 = Player
             directionY  = -1;   // Up
-            speed       = 10;
+            speed       = 5;
             width       = 40;
             height      = 80;
             posx        = ((screenW / 2) - (width / 2));
@@ -37,14 +40,17 @@ vaisseau::vaisseau(int kindOf_, int screenW, int screenH) {
 
         case 2:                 // 2 = Hostile
             directionY  =  1;   // Down
-            speed       =  5;
+            speed       =  2;
             width       = 40;
             height      = 80;
+            std::random_device generator;
+            std::uniform_int_distribution<int> distribution(0,(screenW - width));
+
             posyMax = screenH + speed;
             posyMin = 0 - (height + speed);
             posxMax = screenW - width;
             posy    = posyMin + 1;
-            posx    = 100;
+            posx    = distribution(generator);
             deltaY = (speed * directionY);
             break;
 
@@ -92,7 +98,7 @@ int vaisseau::move() {
         }
         else { err = 1; }
 
-        std::cout<<"kindOf / posy / ymax --- " << kindOf << " "<< posy <<" "<< posyMax <<" "<< std::endl;
+        // std::cout<<"kindOf / posy / ymax --- " << kindOf << " "<< posy <<" "<< posyMax <<" "<< std::endl;
 
         if ( kindOf == 1 )  { resetDelta();  }
         if (err == 1)       { return -1;        }

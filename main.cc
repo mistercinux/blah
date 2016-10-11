@@ -43,7 +43,7 @@ int main()
 
         mysdl.renderClear();
         // Affichage du background
-        SDL_RenderCopy(mysdl.mainRenderer__, mysdl.backgroundTex__, NULL, NULL)
+        SDL_RenderCopy(mysdl.mainRenderer__, mysdl.backgroundTex__, NULL, NULL);
 
         //Affichage du vaisseau principal
         mysdl.renderTexture(mysdl.playerTex__, mysdl.mainRenderer__, Vaisseau.getx(), Vaisseau.gety());
@@ -67,7 +67,7 @@ int main()
         }
 
         SDL_RenderPresent(mysdl.mainRenderer__);
-        SDL_Delay(10); // 10 est une valeur correcte
+        SDL_Delay(50); // 10 est une valeur correcte
 
         // Gestion des évènements associés au clavier
         SDL_PumpEvents();
